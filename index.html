@@ -13,6 +13,76 @@
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
+    <div class="modal" tabindex="-1" role="dialog" id="name-prompt">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Please Enter Your Name</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form>
+                    <div class="modal-body">
+                        <input type="text" id="name-input" class="form-control" placeholder="Name" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" id="save-name" class="btn btn-primary">Enter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="container">
+            <div class="jumbotron text-center">
+                <h1>Ro-Sham-Bo</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Player 1: <span id="p1-name"></span>
+                <div id="p1-choices"></div>
+            </div>
+            <div class="col-md-4">
+                Player 2: <span id="p2-name"></span>
+                <div id="p2-choices"></div>
+            </div>
+            <div class="col-md-4">
+                Scoreboard
+                <div class="row">
+                    <div class="col-6">
+                        Player 1
+                        <dl>
+                            <dt>Wins</dt>
+                            <dd id="p1-wins"></dd>
+                            <dt>Losses</dt>
+                            <dd id="p1-losses"></dd>
+                        </dl>
+                    </div>
+                    <div class="col-6">
+                        Player 2
+                        <dl>
+                            <dt>Wins</dt>
+                            <dd id="p2-wins"></dd>
+                            <dt>Losses</dt>
+                            <dd id="p2-losses"></dd>
+                        </dl>
+                    </div>
+                </div>
+                Chat
+                <div class="row">
+                    <div class="col-12">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    
     
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="

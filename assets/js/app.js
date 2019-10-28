@@ -1,3 +1,7 @@
+const PLAYER_ONE = "playerOne/";
+const PLAYER_TWO = "playerTwo/";
+const CHAT = "chat/";
+
 // Firebase configuration
 var firebaseConfig = {
     apiKey: "AIzaSyDYWHgfVhYT-1UYm4ey2XTD4C7XxjCvHMg",
@@ -11,3 +15,130 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
+
+var playerNumber = "";
+var choices = ["rock", "paper", "scissors"];
+
+var player = {
+    name: "",
+    wins: 0,
+    losses: 0,
+    choice: "",
+    online: true,
+
+    clear: function() {
+        this.name = "";
+        this.wins = 0;
+        this.losses = 0;
+        this.choice = "";
+        this.online = false;
+    },
+
+    update: function() {
+        database.ref(playerNumber).set({
+            name: this.name,
+            wins: this.wins,
+            losses: this.losses,
+            choice: this.choice,
+            online: this.online
+        })
+    }
+}
+
+function setPlayerNumber(number) {
+    playerNumber = number;
+    player.update();
+    $("#name-prompt").modal();
+}
+
+function removePlayer() {
+    player.clear();
+    player.update();
+}
+
+function renderChoices(playerSelectedChoice) {
+    let choicesElement;
+    if (playerNumber === PLAYER_ONE) {
+        choicesElement = $("#p1-choices");
+    } else if (playerNumber === PLAYER_TWO) {
+        choicesElement = $("#p2-choices");
+    }
+    choicesElement.empty();
+    choices.forEach(function(choice) {
+        let button = $("<button>")
+            .addClass("choice btn")
+            .data("choice", choice)
+            .html(choice);
+        if (choice === playerSelectedChoice) {
+            button.addClass("btn-success");
+        } else {
+            button.addClass("btn-primary");
+        }
+        choicesElement.append(button);
+    })
+}
+
+$(document).ready(function() {
+    
+});
+
+$("#save-name").on("click", function(event) {
+    event.preventDefault();
+
+    player.name = $("#name-input").val().trim();
+    player.update();
+    $("#name-prompt").modal("hide");
+})
+
+//determine which player this is
+database.ref().once("value").then(function (snapshot) {
+    if (!snapshot.val().playerOne.online) {
+        setPlayerNumber(PLAYER_ONE);
+    } else if (!snapshot.val().playerTwo.online) {
+        setPlayerNumber(PLAYER_TWO)
+    }
+    console.log(playerNumber);
+});
+
+//------DB listeners------//
+//update playerOne data
+database.ref(PLAYER_ONE).on("value", function(snapshot) {
+    $("#p1-name").html(snapshot.val().name);
+    $("#p1-wins").html(snapshot.val().wins);
+    $("#p1-losses").html(snapshot.val().losses);
+
+    if (playerNumber === PLAYER_ONE) {
+        renderChoices(snapshot.val().choice);
+    }
+
+}, function(error) {
+    console.log(error);
+});
+//update playerTwo data
+database.ref(PLAYER_TWO).on("value", function(snapshot) {
+    $("#p2-name").html(snapshot.val().name);
+    $("#p2-wins").html(snapshot.val().wins);
+    $("#p2-losses").html(snapshot.val().losses);
+
+    if (playerNumber === PLAYER_TWO) {
+        renderChoices(snapshot.val().choice);
+    }
+}, function(error) {
+    console.log(error);
+});
+//update chat
+database.ref(CHAT).on("value", function(snapshot) {
+    //TODO update UI
+}, function(error) {
+    console.log(error);
+});
+
+$(document).on("click", ".choice", function(event) {
+    event.preventDefault();
+    player.choice = $(this).data("choice");
+    player.update();
+})
+
+//remove player from db on unload
+// $(window).on("unload", removePlayer); <-- didn't work in Firefox. Next line does.
+$(window).on("beforeunload", removePlayer);
