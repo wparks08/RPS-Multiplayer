@@ -5,3 +5,20 @@
     border-radius: 5px;
     padding: 5px;
 }
+
+.choice {
+    border: 10px solid #333;
+    border-radius: 10px;
+    margin: 10px;
+    transition: transform 1s;
+}
+
+#p1-choices .picked {
+    transform: translate(30px);
+    border-color: green;
+}
+
+#p2-choices .picked {
+    transform: translate(-30px);
+    border-color: green;
+}

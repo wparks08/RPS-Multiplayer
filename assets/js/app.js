@@ -20,6 +20,7 @@ var database = firebase.database();
 var playerNumber = "";
 var choices = ["rock", "paper", "scissors"];
 var messages = [];
+var inRound = true;
 
 var player = {
     name: "",
@@ -77,21 +78,31 @@ function renderChoices(playerSelectedChoice) {
     }
     choicesElement.empty();
     choices.forEach(function(choice) {
-        let button = $("<button>")
-            .addClass("choice btn")
+        let choiceImage = $("<img>")
+            .addClass("choice img-fluid")
             .data("choice", choice)
-            .html(choice);
+            .attr("src", "./assets/img/" + choice + ".png")
+            .attr("width", "175");
+        
+        choicesElement.append(choiceImage);
+
         if (choice === playerSelectedChoice) {
-            button.addClass("btn-success");
-        } else {
-            button.addClass("btn-primary");
+            choiceImage.on("load", function() {
+                $(this).addClass("picked");
+            })
         }
-        choicesElement.append(button);
-    })
+    });
 }
 
 function clearChat() {
     database.ref(CHAT).set({});
+}
+
+function resetGame() {
+    player.choice = "";
+    player.update();
+    inRound = true;
+    $("#game-status").html("&nbsp;");
 }
 
 $(document).ready(function() {
@@ -168,7 +179,8 @@ database.ref(GAME).on("value", function(snapshot) {
     //determine winner
     let playerOneChoice = snapshot.val().playerOneChoice;
     let playerTwoChoice = snapshot.val().playerTwoChoice;
-    let display = $("#game-status");
+    let display = $("#game-status")
+        .addClass("h3");
 
     if (playerOneChoice == "" || playerTwoChoice == "") {
         return;
@@ -195,7 +207,10 @@ database.ref(GAME).on("value", function(snapshot) {
     }
     //update display
 
-    //reset game after 10 seconds
+    //reset game after 5 seconds
+    inRound = false;
+    setTimeout(resetGame, 5000);
+
 }, function(error) {
     console.log(error);
 })
@@ -213,8 +228,10 @@ $("#send-message").on("click", function(event) {
 
 $(document).on("click", ".choice", function(event) {
     event.preventDefault();
-    player.choice = $(this).data("choice");
-    player.update();
+    if (inRound) {
+        player.choice = $(this).data("choice");
+        player.update();
+    }
 })
 
 //remove player from db on unload
