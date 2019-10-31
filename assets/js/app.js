@@ -19,6 +19,7 @@ var database = firebase.database();
 
 var playerNumber = "";
 var choices = ["rock", "paper", "scissors"];
+var messages = [];
 
 var player = {
     name: "",
@@ -64,6 +65,7 @@ function setPlayerNumber(number) {
 function removePlayer() {
     player.clear();
     player.update();
+    clearChat();
 }
 
 function renderChoices(playerSelectedChoice) {
@@ -86,6 +88,10 @@ function renderChoices(playerSelectedChoice) {
         }
         choicesElement.append(button);
     })
+}
+
+function clearChat() {
+    database.ref(CHAT).set({});
 }
 
 $(document).ready(function() {
@@ -136,9 +142,23 @@ database.ref(PLAYER_TWO).on("value", function(snapshot) {
 }, function(error) {
     console.log(error);
 });
+
 //update chat
-database.ref(CHAT).on("value", function(snapshot) {
-    //TODO update UI
+database.ref(CHAT).on("child_added", function(snapshot) {
+        let mediaDiv = $("<div>")
+            .addClass("media mb-3");
+        let mediaBodyDiv = $("<div>")
+            .addClass("media-body");
+        let username = $("<h6>")
+            .addClass("mt-0 mb-0");
+
+        username.html(snapshot.val().user + ":");
+        mediaBodyDiv.html(snapshot.val().message);
+
+        mediaBodyDiv.prepend(username);
+        mediaDiv.append(mediaBodyDiv);
+        $("#chat-target").append(mediaDiv)
+            .scrollTop($("#chat-target")[0].scrollHeight);
 }, function(error) {
     console.log(error);
 });
@@ -178,6 +198,17 @@ database.ref(GAME).on("value", function(snapshot) {
     //reset game after 10 seconds
 }, function(error) {
     console.log(error);
+})
+
+$("#send-message").on("click", function(event) {
+    event.preventDefault();
+
+    database.ref(CHAT).push({
+        message: $("#message").val().trim(),
+        user: player.name
+    });
+
+    $("#message").val("");
 })
 
 $(document).on("click", ".choice", function(event) {

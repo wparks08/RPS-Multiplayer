@@ -1,0 +1,7 @@
+#chat-target {
+    height: 350px;
+    overflow-y: scroll;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 5px;
+}
