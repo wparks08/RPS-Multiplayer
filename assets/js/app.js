@@ -1,6 +1,7 @@
 const PLAYER_ONE = "playerOne/";
 const PLAYER_TWO = "playerTwo/";
 const CHAT = "chat/";
+const GAME = "game/";
 
 // Firebase configuration
 var firebaseConfig = {
@@ -41,7 +42,16 @@ var player = {
             losses: this.losses,
             choice: this.choice,
             online: this.online
-        })
+        });
+        if (playerNumber === PLAYER_ONE) {
+            database.ref(GAME).update({
+                playerOneChoice: this.choice
+            });
+        } else if (playerNumber === PLAYER_TWO) {
+            database.ref(GAME).update({
+                playerTwoChoice: this.choice
+            });
+        }
     }
 }
 
@@ -132,6 +142,43 @@ database.ref(CHAT).on("value", function(snapshot) {
 }, function(error) {
     console.log(error);
 });
+
+//update game
+database.ref(GAME).on("value", function(snapshot) {
+    //determine winner
+    let playerOneChoice = snapshot.val().playerOneChoice;
+    let playerTwoChoice = snapshot.val().playerTwoChoice;
+    let display = $("#game-status");
+
+    if (playerOneChoice == "" || playerTwoChoice == "") {
+        return;
+    }
+
+    if (playerOneChoice == playerTwoChoice) {
+        display.html("It was a tie!");
+    } else if ((playerOneChoice == "rock" && playerTwoChoice == "scissors") || (playerOneChoice == "scissors" && playerTwoChoice == "paper") || (playerOneChoice == "paper" && playerTwoChoice == "rock")) {
+        display.html("Player 1 Wins!");
+        if (playerNumber === PLAYER_ONE) {
+            player.wins++;
+        } else {
+            player.losses++;
+        }
+        player.update()
+    } else {
+        display.html("Player 2 Wins!");
+        if (playerNumber === PLAYER_TWO) {
+            player.wins++;
+        } else {
+            player.losses++;
+        }
+        player.update()
+    }
+    //update display
+
+    //reset game after 10 seconds
+}, function(error) {
+    console.log(error);
+})
 
 $(document).on("click", ".choice", function(event) {
     event.preventDefault();
