@@ -97,11 +97,22 @@ function renderChoices(playerSelectedChoice) {
     });
 }
 
+function renderOpponentChoice(opponentChoice, opponentElement) {
+    let choiceImg = $("<img>")
+        .attr("src", "./assets/img/" + opponentChoice + ".png")
+        .addClass("choice img-fluid picked")
+        .attr("width", "175");
+
+    $(opponentElement).append(choiceImg);
+}
+
 function clearChat() {
     database.ref(CHAT).set({});
 }
 
 function resetGame() {
+    $("#p1-choices").empty();
+    $("#p2-choices").empty();
     player.choice = "";
     player.update();
     inRound = true;
@@ -189,6 +200,13 @@ database.ref(GAME).on("value", function(snapshot) {
 
     if (playerOneChoice == "" || playerTwoChoice == "") {
         return;
+    }
+
+    //render opponent choice
+    if (playerNumber === PLAYER_ONE) {
+        renderOpponentChoice(playerTwoChoice, $("#p2-choices"));
+    } else if (playerNumber === PLAYER_TWO) {
+        renderOpponentChoice(playerOneChoice, $("#p1-choices"));
     }
 
     if (playerOneChoice == playerTwoChoice) {
