@@ -22,6 +22,9 @@ var choices = ["rock", "paper", "scissors"];
 var messages = [];
 var inRound = true;
 
+var nextRoundIn = 5;
+var intervalId;
+
 var player = {
     name: "",
     wins: 0,
@@ -103,6 +106,8 @@ function resetGame() {
     player.update();
     inRound = true;
     $("#game-status").html("&nbsp;");
+    nextRoundIn = 5;
+    clearInterval(intervalId);
 }
 
 $(document).ready(function() {
@@ -206,7 +211,16 @@ database.ref(GAME).on("value", function(snapshot) {
         player.update()
     }
     //update display
-
+    display.append($("<h5 id='countdown'>Next round in 5 seconds...</h5>"));
+    intervalId = setInterval(function() {
+        nextRoundIn--;
+        if (nextRoundIn === 1) {
+            $("#countdown").html("Next round in " + nextRoundIn + " second...");
+        } else {
+            $("#countdown").html("Next round in " + nextRoundIn + " seconds...");
+        }
+        
+    }, 1000)
     //reset game after 5 seconds
     inRound = false;
     setTimeout(resetGame, 5000);

@@ -14,11 +14,11 @@
 }
 
 #p1-choices .picked {
-    transform: translate(30px);
+    transform: translate(50px);
     border-color: green;
 }
 
 #p2-choices .picked {
-    transform: translate(-30px);
+    transform: translate(-50px);
     border-color: green;
 }
